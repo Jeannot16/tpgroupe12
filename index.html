@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion des Contacts</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      position: relative;
+    }
+    h1 {
+      text-align: center;
+      margin-top: 60px;
+    }
+    form {
+      margin: 20px auto;
+      display: flex;
+      justify-content: center;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"] {
+      margin: 5px;
+      padding: 10px;
+      width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background: #14c004;
+      color: white;
+      border: none;
+      padding: 11px 15px;
+      cursor: pointer;
+      border-radius: 4px;
+      margin: 5px;
+    }
+    button:hover {
+      background: #14c004;
+    }
+    .search-bar {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+    input[type="search"] {
+      padding: 10px;
+      width: 250px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    table {
+      width: 80%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background: #fff;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+    th {
+      background-color: #14c004;
+      color: white;
+    }
+    .delete-btn {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .delete-btn:hover {
+      background: #c0392b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barre de recherche positionnée en haut à droite -->
+  <div class="search-bar">
+    <input type="search" id="searchInput" placeholder="Rechercher un contact...">
+  </div>
+
+  <h1>Gestion des Contacts</h1>
+
+  <form id="contactForm">
+    <div class="form-group">
+      <input type="text" id="contactName" placeholder="Nom" required>
+      <input type="email" id="contactEmail" placeholder="Email" required>
+      <input type="tel" id="contactPhone" placeholder="Numéro de téléphone" required>
+      <button type="submit">Ajouter Contact</button>
+    </div>
+  </form>
+
+  <!-- Tableau des contacts avec en-têtes -->
+  <table id="contactTable">
+    <thead>
+      <tr>
+        <th>Nom</th>
+        <th>Email</th>
+        <th>Numéro de téléphone</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Les contacts s'afficheront ici -->
+    </tbody>
+  </table>
+
+  <script>
+    // Tableau pour stocker les contacts
+    const contacts = [];
+
+    // Charger les contacts sauvegardés lors du chargement de la page
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedContacts = localStorage.getItem('contacts');
+      if (savedContacts) {
+        contacts.push(...JSON.parse(savedContacts));
+        displayContacts(contacts);
+      }
+    });
+
+    // Formulaire d'ajout de contact
+    document.getElementById('contactForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const name = document.getElementById('contactName').value.trim();
+      const email = document.getElementById('contactEmail').value.trim();
+      const phone = document.getElementById('contactPhone').value.trim();
+
+      if (isDuplicate(name, email, phone)) {
+        alert('Ce contact existe déjà.');
+      } else if (isPhoneDuplicate(phone)) {
+        alert('Ce numéro de téléphone est déjà utilisé.');
+      } else {
+        addContact(name, email, phone);
+      }
+      this.reset();
+    });
+
+    // Recherche en temps réel
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const query = this.value.toLowerCase();
+      const filteredContacts = contacts.filter(contact =>
+        contact.name.toLowerCase().includes(query) ||
+        contact.email.toLowerCase().includes(query) ||
+        contact.phone.includes(query)
+      );
+      displayContacts(filteredContacts);
+    });
+
+    // Fonction pour vérifier les doublons
+    function isDuplicate(name, email, phone) {
+      return contacts.some(contact =>
+        contact.name === name && contact.email === email && contact.phone === phone
+      );
+    }
+
+    // Fonction pour vérifier si le numéro de téléphone est déjà utilisé
+    function isPhoneDuplicate(phone) {
+      return contacts.some(contact => contact.phone === phone);
+    }
+
+    // Fonction pour ajouter un contact
+    function addContact(name, email, phone) {
+      const newContact = { name, email, phone };
+      contacts.push(newContact);
+      localStorage.setItem('contacts', JSON.stringify(contacts));
+      displayContacts(contacts);
+    }
+
+    // Fonction pour afficher les contacts
+    function displayContacts(contacts) {
+      const contactTableBody = document.querySelector('#contactTable tbody');
+      contactTableBody.innerHTML = '';
+      contacts.forEach(contact => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${contact.name}</td>
+          <td>${contact.email}</td>
+          <td>${contact.phone}</td>
+          <td><button class="delete-btn" onclick="deleteContact('${contact.email}')">Supprimer</button></td>
+        `;
+        contactTableBody.appendChild(row);
+      });
+    }
+
+    // Fonction pour supprimer un contact
+    function deleteContact(email) {
+      const index = contacts.findIndex(contact => contact.email === email);
+      if (index !== -1) {
+        contacts.splice(index, 1);
+        localStorage.setItem('contacts', JSON.stringify(contacts));
+        displayContacts(contacts);
+      }
+    }
+  </script>
+</body>
+</html>
