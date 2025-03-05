@@ -1,0 +1,29 @@
+.form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: right;
+}
+.search-bar {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+input[type="text"], input[type="email"], input[type="tel"] {
+    margin: 5px;
+    padding: 10px;
+    width: 300px;
+}
+.search-bar {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+body {
+    /* Autres styles */
+    position: relative;
+}
+h1 {
+    text-align: center;
+    margin-top: 60px;
+}
