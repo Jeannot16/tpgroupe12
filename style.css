@@ -18,6 +18,7 @@ input[type="text"], input[type="email"], input[type="tel"] {
     position: absolute;
     top: 20px;
     right: 20px;
+    background-color: azure;
 }
 body {
     /* Autres styles */
